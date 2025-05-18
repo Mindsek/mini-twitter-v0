@@ -117,7 +117,10 @@ export class AuthController {
       },
     },
   })
-  @ApiResponse({ status: 401, description: 'Invalid or missing token' })
+  @ApiResponse({
+    status: 401,
+    description: 'No token provided',
+  })
   verify(@Req() req: Request & { user: JwtPayload }, @Res() res: Response) {
     const user = req.user;
 

@@ -24,7 +24,6 @@ export class AuthGuard implements CanActivate {
       .switchToHttp()
       .getRequest<Request & { user: JwtPayload }>();
     const token = this.extractTokenFromHeader(request);
-    this.logger.log('token', token);
     if (!token) {
       throw new UnauthorizedException('No token provided');
     }
@@ -48,10 +47,20 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
+    // Try Bearer token first
     const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    if (type !== 'Bearer' || !token) {
-      throw new UnauthorizedException();
+    if (type === 'Bearer' && token) {
+      this.logger.log('Bearer token found', token);
+      return token;
     }
-    return token;
+
+    // Try cookie if Bearer token not found
+    const cookieToken = request.cookies?.['auth-session'];
+    if (cookieToken) {
+      this.logger.log('Cookie token found', cookieToken);
+      return cookieToken as string;
+    }
+
+    return undefined;
   }
 }
