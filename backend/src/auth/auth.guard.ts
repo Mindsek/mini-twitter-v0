@@ -36,7 +36,7 @@ export class AuthGuard implements CanActivate {
       request.user = payload;
       if (payload.id && typeof payload.id === 'string') {
         // Find the user for security
-        const user = await this.userService.findOne(payload.id as string);
+        const user = await this.userService.findOne(payload.id);
         if (!user) throw new UnauthorizedException('User not found');
         request.user = { ...payload, ...user };
       }
